@@ -20,6 +20,8 @@ namespace DaisyFx.Hosting
             _chains = chains.ToArray();
         }
 
+        public const string Mode = "console";
+
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
             foreach (var chain in _chains)

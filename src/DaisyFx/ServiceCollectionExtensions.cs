@@ -13,25 +13,28 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddDaisy(this IServiceCollection serviceCollection,
-            IConfiguration configuration,
             Action<IDaisyServiceCollection> configureDaisy)
         {
-            var hostMode = configuration.GetValue<string>("daisy:mode")?.ToLower() ?? "service";
+            var provider = serviceCollection.BuildServiceProvider();
+            var configuration = new DaisyConfiguration(provider.GetService<IConfiguration>()?.GetValue<string>("daisy:mode"));
+            configureDaisy(new DaisyServiceCollection(configuration, serviceCollection));
 
-            configureDaisy(new DaisyServiceCollection(hostMode, serviceCollection, configuration));
-
-            serviceCollection.AddSingleton<HttpChainRouter>();
-            serviceCollection.AddSingleton(typeof(EventHandlerCollection<>));
-            serviceCollection.AddHostedService(s =>
+            serviceCollection
+                .AddSingleton<IDaisyConfiguration>(configuration)
+                .AddSingleton<HttpChainRouter>()
+                .AddSingleton(typeof(EventHandlerCollection<>))
+                .AddHostedService(s =>
             {
                 if (s.GetService<IHostInterface>() is { } hostInterface)
                     return hostInterface;
 
-                return hostMode switch
+                var configuration = s.GetRequiredService<IDaisyConfiguration>();                
+
+                return configuration.HostMode switch
                 {
-                    "console" => ActivatorUtilities.CreateInstance<ConsoleHostInterface>(s),
-                    "service" => ActivatorUtilities.CreateInstance<ServiceHostInterface>(s),
-                    _ => throw new ArgumentException("mode", $"{hostMode} is not a valid value for daisy:mode")
+                    ConsoleHostInterface.Mode => ActivatorUtilities.CreateInstance<ConsoleHostInterface>(s),
+                    ServiceHostInterface.Mode => ActivatorUtilities.CreateInstance<ServiceHostInterface>(s),
+                    _ => throw new ArgumentException($"{configuration.HostMode} is not a valid value.", nameof(configuration.HostMode))
                 };
             });
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DaisyFx.Events;
 using DaisyFx.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -11,25 +10,22 @@ namespace DaisyFx
 {
     public class DaisyServiceCollection : IDaisyServiceCollection
     {
-        private readonly string _hostMode;
         private readonly HashSet<string> _registeredModes = new();
         private readonly HashSet<object> _registeredChains = new();
         private readonly IServiceCollection _serviceCollection;
-        private readonly IConfiguration _configuration;
+        private readonly IDaisyConfiguration _configuration;
 
-        public DaisyServiceCollection(string hostMode, IServiceCollection serviceCollection,
-            IConfiguration configuration)
+        public DaisyServiceCollection(IDaisyConfiguration configuration, IServiceCollection serviceCollection)
         {
-            _hostMode = hostMode;
-            _serviceCollection = serviceCollection;
             _configuration = configuration;
+            _serviceCollection = serviceCollection;
         }
 
         IServiceCollection IDaisyServiceCollection.ServiceCollection => _serviceCollection;
-        IConfiguration IDaisyServiceCollection.Configuration => _configuration;
+        IDaisyConfiguration IDaisyServiceCollection.Configuration => _configuration;
 
         public IDaisyServiceCollection AddHostMode<THostInterface>(string alias,
-            Action<IDaisyServiceCollection, IServiceCollection, IConfiguration> configureServices)
+            Action<IDaisyServiceCollection, IServiceCollection> configureServices)
             where THostInterface : class, IHostInterface
         {
             if (!_registeredModes.Add(alias))
@@ -37,10 +33,10 @@ namespace DaisyFx
                 throw new NotSupportedException($"{nameof(alias)}: {alias} is already registered");
             }
 
-            if (_hostMode.Equals(alias, StringComparison.OrdinalIgnoreCase))
+            if (_configuration.HostMode.Equals(alias, StringComparison.OrdinalIgnoreCase))
             {
                 _serviceCollection.TryAddSingleton<IHostInterface, THostInterface>();
-                configureServices(this, _serviceCollection, _configuration);
+                configureServices(this, _serviceCollection);
             }
 
             return this;

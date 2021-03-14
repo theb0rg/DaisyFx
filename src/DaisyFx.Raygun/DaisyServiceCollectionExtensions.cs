@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Mindscape.Raygun4Net;
@@ -18,7 +19,9 @@ namespace DaisyFx.Raygun
         {
             ThrowIfAlreadyAdded(daisy.ServiceCollection);
 
-            daisy.ServiceCollection.Configure<RaygunSettings>(daisy.Configuration.GetSection("RaygunSettings"));
+            var provider = daisy.ServiceCollection.BuildServiceProvider();
+
+            daisy.ServiceCollection.Configure<RaygunSettings>(provider.GetRequiredService<IConfiguration>().GetSection("RaygunSettings"));
             daisy.ServiceCollection.TryAddSingleton<IRaygunClientProvider, RaygunClientProvider>();
 
             daisy.AddEventHandlerSingleton<THandler>();

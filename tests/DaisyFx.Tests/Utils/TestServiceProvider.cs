@@ -26,7 +26,7 @@ namespace DaisyFx.Tests.Utils
             serviceCollection.AddSingleton<IConfiguration>(configuration);
 
             configureServices?.Invoke(serviceCollection);
-            serviceCollection.AddDaisy(configuration, collection =>
+            serviceCollection.AddDaisy(collection =>
             {
                 configureDaisy?.Invoke(collection);
             });

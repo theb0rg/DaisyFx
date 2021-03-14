@@ -33,7 +33,7 @@ namespace DaisyFx.Tests.Sources.HttpSource
                     x.ConfigureServices((context, services) =>
                     {
                         services.AddAuthorization();
-                        services.AddDaisy(context.Configuration, d =>
+                        services.AddDaisy(d =>
                         {
                             d.AddChain<HttpTestChain>();
                         });

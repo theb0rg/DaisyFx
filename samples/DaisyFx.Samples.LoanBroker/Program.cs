@@ -24,7 +24,7 @@ namespace DaisyFx.Samples.LoanBroker
             services.AddSingleton<ICreditService, CreditService>();
             services.AddSingleton<ILoanService, LoanService>();
 
-            services.AddDaisy(hostContext.Configuration, d =>
+            services.AddDaisy(d =>
             {
                 d.AddChain<LoanBrokerChain>();
             });

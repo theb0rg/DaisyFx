@@ -35,7 +35,8 @@ namespace DaisyFx.Tests
             var configuration = CreateConfiguration(("Daisy:Mode", mode));
             var provider = CreateServiceProvider(serviceCollection =>
             {
-                serviceCollection.AddDaisy(configuration, _ => { });
+                serviceCollection.AddSingleton(configuration);
+                serviceCollection.AddDaisy( _ => { });
             });
 
             var hostedServices = provider.GetServices<IHostedService>();
@@ -48,7 +49,8 @@ namespace DaisyFx.Tests
         {
             var configuration = CreateConfiguration();
             var serviceCollection = new ServiceCollection()
-                .AddDaisy(configuration, d =>
+                .AddSingleton(configuration)
+                .AddDaisy(d =>
                 {
                     d.AddChain<TestChain<Signal>>();
                 });
@@ -63,7 +65,8 @@ namespace DaisyFx.Tests
         {
             var configuration = CreateConfiguration();
             var serviceCollection = new ServiceCollection()
-                .AddDaisy(configuration, d =>
+                .AddSingleton(configuration)
+                .AddDaisy(d =>
                 {
                     d.AddChain<TestChain<Signal>>();
                     d.AddChain<TestChain<string>>();
@@ -82,10 +85,11 @@ namespace DaisyFx.Tests
             Assert.Throws<NotSupportedException>(() =>
             {
                 new ServiceCollection()
-                    .AddDaisy(configuration, d =>
+                    .AddSingleton(configuration)
+                    .AddDaisy(d =>
                     {
-                        d.AddHostMode<ConsoleHostInterface>("console", (_, _, _) => { });
-                        d.AddHostMode<ConsoleHostInterface>("console", (_, _, _) => { });
+                        d.AddHostMode<ConsoleHostInterface>("console", (_, _) => { });
+                        d.AddHostMode<ConsoleHostInterface>("console", (_, _) => { });
                     });
             });
         }
@@ -98,9 +102,10 @@ namespace DaisyFx.Tests
 
             var services = new ServiceCollection()
                 .AddLogging()
-                .AddDaisy(configuration, d =>
+                .AddSingleton(configuration)
+                .AddDaisy(d =>
                 {
-                    d.AddHostMode<ConsoleHostInterface>("console", (_, serviceCollection, _) =>
+                    d.AddHostMode<ConsoleHostInterface>("console", (_, serviceCollection) =>
                     {
                         serviceCollection.AddSingleton(verification);
                     });

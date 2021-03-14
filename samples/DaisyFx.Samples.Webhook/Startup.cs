@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +21,7 @@ namespace DaisyFx.Samples.Webhook
             services.AddAuthorization();
             services.AddControllers();
 
-            services.AddDaisy(Configuration, d =>
+            services.AddDaisy(d =>
             {
                 d.AddChain<OrderChain>();
             });

@@ -1,4 +1,5 @@
 using DaisyFx.Samples.KitchenSink.EventHandlers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,7 +18,7 @@ namespace DaisyFx.Samples.KitchenSink
 
         private static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.AddDaisy(hostContext.Configuration, d =>
+            services.AddDaisy(d =>
             {
                 d.AddChain<KitchenSinkChain>();
                 d.AddEventHandlerSingleton<ExceptionEventHandler>();

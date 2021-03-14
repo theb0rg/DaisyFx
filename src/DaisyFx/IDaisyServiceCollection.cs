@@ -6,13 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DaisyFx
 {
+
     public interface IDaisyServiceCollection
     {
         public IServiceCollection ServiceCollection { get; }
-        public IConfiguration Configuration { get; }
+        public IDaisyConfiguration Configuration { get; }
 
         IDaisyServiceCollection AddHostMode<THostInterface>(string alias,
-            Action<IDaisyServiceCollection, IServiceCollection, IConfiguration> configureServices)
+            Action<IDaisyServiceCollection, IServiceCollection> configureServices)
             where THostInterface : class, IHostInterface;
 
         IDaisyServiceCollection AddChain<TChainBuilder>()
